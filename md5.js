@@ -12,8 +12,6 @@
 
 import { subbin } from "https://js.sabae.cc/binutil.js";
 
-const hex_chr = '0123456789abcdef'.split('');
-
 	const md5cycle = (x, k) => {
 		let a = x[0], b = x[1], c = x[2], d = x[3];
 
@@ -147,21 +145,19 @@ const hex_chr = '0123456789abcdef'.split('');
 		return md5blks;
 	}
 
-	const rhex = (n) => {
-		let s = '';
-		for (let j = 0; j < 4; j++)
-			s += hex_chr[(n >> (j * 8 + 4)) & 0x0F] + hex_chr[(n >> (j * 8)) & 0x0F];
-		return s;
-	}
-
-	const hex = (x) => {
-		for (let i = 0; i < x.length; i++)
-			x[i] = rhex(x[i]);
-		return x.join('');
+	const bin = (x) => {
+		const res = new Uint8Array(16);
+		for (let i = 0; i < x.length; i++) {
+			const n = x[i];
+			for (let j = 0; j < 4; j++) {
+				res[i * 4 + j] = n >> (j * 8);
+			}
+		}
+		return res;
 	}
 
 	const digest = (s) => {
-		return hex(md51(s));
+		return bin(md51(s));
 	}
 
 	/* this is much faster, so if possible we use it. Some IEs are the
