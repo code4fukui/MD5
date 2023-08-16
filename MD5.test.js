@@ -4,3 +4,6 @@ import { MD5 } from "./MD5.js";
 Deno.test("simple", () => {
 	t.assertEquals(MD5.digest("hello"), "5d41402abc4b2a76b9719d911017c592");
 });
+Deno.test("uint8array", () => {
+	t.assertEquals(MD5.digest(new TextEncoder().encode("hello")), "5d41402abc4b2a76b9719d911017c592");
+});

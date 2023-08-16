@@ -10,6 +10,8 @@
  * http://www.opensource.org/licenses/bsd-license
  */
 
+import { subbin } from "https://js.sabae.cc/binutil.js";
+
 const hex_chr = '0123456789abcdef'.split('');
 
 	const md5cycle = (x, k) => {
@@ -111,20 +113,19 @@ const hex_chr = '0123456789abcdef'.split('');
 	}
 
 	const md51 = (s) => {
-		// Converts the string to UTF-8 "bytes" when necessary
-		if (/[\x80-\xFF]/.test(s)) {
-			s = unescape(encodeURI(s));
+		if (typeof s == "string") {
+			s = new TextEncoder().encode(s);
 		}
-		let txt = '';
-		const n = s.length, state = [1732584193, -271733879, -1732584194, 271733878];
+		const n = s.length;
+		const state = [1732584193, -271733879, -1732584194, 271733878];
 		let i;
 		for (i = 64; i <= s.length; i += 64) {
-			md5cycle(state, md5blk(s.substring(i - 64, i)));
+			md5cycle(state, md5blk(subbin(s, i - 64, 64)));
 		}
-		s = s.substring(i - 64);
+		s = subbin(s, i - 64);
 		const tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		for (i = 0; i < s.length; i++)
-			tail[i >> 2] |= s.charCodeAt(i) << ((i % 4) << 3);
+			tail[i >> 2] |= s[i] << ((i % 4) << 3);
 		tail[i >> 2] |= 0x80 << ((i % 4) << 3);
 		if (i > 55) {
 			md5cycle(state, tail);
@@ -138,10 +139,10 @@ const hex_chr = '0123456789abcdef'.split('');
 	const md5blk = (s) => { /* I figured global was faster.   */
 		const md5blks = []; /* Andy King said do it this way. */
 		for (let i = 0; i < 64; i += 4) {
-			md5blks[i >> 2] = s.charCodeAt(i) +
-			                  (s.charCodeAt(i + 1) << 8) +
-			                  (s.charCodeAt(i + 2) << 16) +
-			                  (s.charCodeAt(i + 3) << 24);
+			md5blks[i >> 2] = s[i] +
+			                  (s[i + 1] << 8) +
+			                  (s[i + 2] << 16) +
+			                  (s[i + 3] << 24);
 		}
 		return md5blks;
 	}
@@ -172,4 +173,4 @@ const hex_chr = '0123456789abcdef'.split('');
 
 export const MD5 = {
 	digest,
-}
+};
